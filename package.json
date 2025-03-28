@@ -1,7 +1,14 @@
 {
-  "name": "proj01",
+  "name": "kosi",
   "version": "0.1.0",
   "private": true,
+  "description": "A simple, secure, and offline-first journaling application with end-to-end encryption",
+  "author": "Jigar Jain",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jigarjain/kosi.git"
+  },
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
