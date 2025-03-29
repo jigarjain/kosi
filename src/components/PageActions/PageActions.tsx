@@ -16,12 +16,12 @@ export default function ActionsMenu() {
       await addNewEntryMutation.mutateAsync(
         {
           entryText: entry,
-          pageSlug: currentPageSlug,
+          pageSlug: currentPageSlug
         },
         {
           onSuccess: () => {
             modalRef.current?.close();
-          },
+          }
         }
       );
     },

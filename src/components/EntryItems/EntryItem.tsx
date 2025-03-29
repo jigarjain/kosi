@@ -17,7 +17,7 @@ export default function EntryItem({ entry }: { entry: Entry }) {
     try {
       await deleteEntry.mutateAsync({
         entryId: entry.id,
-        pageSlug: currentPageSlug,
+        pageSlug: currentPageSlug
       });
     } catch (error) {
       console.error("Failed to delete entry:", error);
@@ -31,7 +31,7 @@ export default function EntryItem({ entry }: { entry: Entry }) {
   const handleUpdate = async (entryText: string) => {
     await updateEntry.mutateAsync({
       ...entry,
-      content: entryText,
+      content: entryText
     });
 
     modalRef.current?.close();

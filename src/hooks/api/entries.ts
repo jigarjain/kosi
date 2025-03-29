@@ -8,7 +8,7 @@ import { createNewEntry, createNewPage } from "@/lib/utils";
 const createEntryQuery = (id: string) => ({
   queryKey: ["entries", id],
   queryFn: async () => dbOperations.getEntry(id),
-  enabled: !!id,
+  enabled: !!id
 });
 
 export function useEntriesByPageSlug(pageSlug: string) {
@@ -18,7 +18,7 @@ export function useEntriesByPageSlug(pageSlug: string) {
   const entryIds = pageQuery.data?.entries || [];
 
   const entryQueries = useQueries({
-    queries: entryIds.map((id) => createEntryQuery(id)),
+    queries: entryIds.map((id) => createEntryQuery(id))
   });
 
   // Combine the results and handle loading states
@@ -37,7 +37,7 @@ export function useEntriesByPageSlug(pageSlug: string) {
     data,
     isLoading,
     isError,
-    error: pageQuery.error || entryQueries.find((query) => query.error)?.error,
+    error: pageQuery.error || entryQueries.find((query) => query.error)?.error
   };
 }
 
@@ -72,9 +72,9 @@ export function useAddEntry() {
     onSuccess: (_, { pageSlug }) => {
       queryClient.invalidateQueries({ queryKey: ["entries"] });
       queryClient.invalidateQueries({
-        queryKey: ["entries", "byPage", pageSlug],
+        queryKey: ["entries", "byPage", pageSlug]
       });
-    },
+    }
   });
 }
 
@@ -85,7 +85,7 @@ export function useUpdateEntry() {
     mutationFn: async (entry: Entry) => {
       const updatedEntry = {
         ...entry,
-        updatedAt: new Date(),
+        updatedAt: new Date()
       };
       await dbOperations.updateEntry(updatedEntry);
       return updatedEntry;
@@ -95,7 +95,7 @@ export function useUpdateEntry() {
       queryClient.invalidateQueries({ queryKey: ["entries", variables.id] });
       // We don't know which page this entry belongs to, so we invalidate all pages
       queryClient.invalidateQueries({ queryKey: ["entries", "byPage"] });
-    },
+    }
   });
 }
 
@@ -117,7 +117,7 @@ export function useDeleteEntry() {
         const updatedPage = {
           ...page,
           entries: page.entries.filter((id: string) => id !== entryId),
-          updatedAt: new Date(),
+          updatedAt: new Date()
         };
 
         await updatePage.mutateAsync(updatedPage);
@@ -129,8 +129,8 @@ export function useDeleteEntry() {
     onSuccess: (_, { pageSlug }) => {
       queryClient.invalidateQueries({ queryKey: ["entries"] });
       queryClient.invalidateQueries({
-        queryKey: ["entries", "byPage", pageSlug],
+        queryKey: ["entries", "byPage", pageSlug]
       });
-    },
+    }
   });
 }

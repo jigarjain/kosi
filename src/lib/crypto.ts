@@ -1,7 +1,7 @@
 /**
  * Generates a cryptographically secure random salt
  */
-async function generateSalt(): Promise<Uint8Array> {
+export async function generateSalt(): Promise<Uint8Array> {
   return crypto.getRandomValues(new Uint8Array(16)); // Generate a 16-byte salt
 }
 
@@ -10,7 +10,7 @@ async function generateSalt(): Promise<Uint8Array> {
  * @param password - The user's plain text password
  * @param salt - The salt used for key derivation. Should be generated using generateSalt()
  */
-async function deriveMasterKey(
+export async function deriveMasterKey(
   password: string,
   salt: Uint8Array
 ): Promise<CryptoKey> {
@@ -28,7 +28,7 @@ async function deriveMasterKey(
       name: "PBKDF2",
       salt: salt,
       iterations: 100000, // High iteration count for security
-      hash: "SHA-256",
+      hash: "SHA-256"
     },
     keyMaterial,
     { name: "AES-GCM", length: 256 },
@@ -40,10 +40,10 @@ async function deriveMasterKey(
 /**
  * Generates a new Data Encryption Key (DEK)
  */
-async function generateDEK(): Promise<CryptoKey> {
+export async function generateDEK(): Promise<CryptoKey> {
   return crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, [
     "encrypt",
-    "decrypt",
+    "decrypt"
   ]);
 }
 
@@ -101,7 +101,7 @@ async function decryptDEK(
  * @param dek - The DEK to be encrypted
  * @param masterKey - The master key used for encryption
  */
-async function encryptDEKWithMK(
+export async function encryptDEKWithMK(
   dek: CryptoKey,
   masterKey: CryptoKey
 ): Promise<{ encryptedDEK: ArrayBuffer; ivForDek: Uint8Array }> {
@@ -114,7 +114,7 @@ async function encryptDEKWithMK(
  * @param ivForDek - The initialization vector used for DEK encryption
  * @param masterKey - The master key used for decryption
  */
-async function decryptDEKWithMK(
+export async function decryptDEKWithMK(
   encryptedDEK: ArrayBuffer,
   ivForDek: Uint8Array,
   masterKey: CryptoKey
@@ -127,7 +127,7 @@ async function decryptDEKWithMK(
  * @param dek - The DEK to be encrypted
  * @param recoveryKey - The recovery key used for encryption
  */
-async function encryptDEKWithRK(
+export async function encryptDEKWithRK(
   dek: CryptoKey,
   recoveryKey: CryptoKey
 ): Promise<{ encryptedDEK: ArrayBuffer; ivForDek: Uint8Array }> {
@@ -140,7 +140,7 @@ async function encryptDEKWithRK(
  * @param ivForDek - The initialization vector used for DEK encryption
  * @param recoveryKey - The recovery key used for decryption
  */
-async function decryptDEKWithRK(
+export async function decryptDEKWithRK(
   encryptedDEK: ArrayBuffer,
   ivForDek: Uint8Array,
   recoveryKey: CryptoKey
@@ -153,7 +153,7 @@ async function decryptDEKWithRK(
  * @param data - The data to be encrypted
  * @param dek - The DEK used for encryption
  */
-async function encryptData(
+export async function encryptData(
   data: string,
   dek: CryptoKey
 ): Promise<{ encryptedData: ArrayBuffer; iv: Uint8Array }> {
@@ -175,7 +175,7 @@ async function encryptData(
  * @param iv - The initialization vector used for encryption
  * @param dek - The DEK used for decryption
  */
-async function decryptData(
+export async function decryptData(
   encryptedData: ArrayBuffer,
   iv: Uint8Array,
   dek: CryptoKey

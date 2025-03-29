@@ -6,7 +6,7 @@ export function usePageBySlug(pageSlug: string) {
   return useQuery<Page | null>({
     queryKey: ["pages", pageSlug],
     queryFn: async () => dbOperations.getPageBySlug(pageSlug),
-    enabled: !!pageSlug,
+    enabled: !!pageSlug
   });
 }
 
@@ -20,7 +20,7 @@ export function useAddPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["pages"] });
-    },
+    }
   });
 }
 
@@ -35,6 +35,6 @@ export function useUpdatePage() {
     onSuccess: (_, updatedPage) => {
       queryClient.invalidateQueries({ queryKey: ["pages"] });
       queryClient.invalidateQueries({ queryKey: ["pages", updatedPage.slug] });
-    },
+    }
   });
 }

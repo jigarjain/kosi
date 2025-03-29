@@ -6,7 +6,7 @@ export interface AppState {
 }
 
 export const defaultAppState: AppState = {
-  currentPageSlug: convertToPageSlug(new Date()),
+  currentPageSlug: convertToPageSlug(new Date())
 };
 
 export const AppStateContext = createContext<AppState>(defaultAppState);

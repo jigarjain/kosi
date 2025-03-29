@@ -40,13 +40,16 @@ npm install
 ```
 
 3. Set up environment variables:
-   Copy `.env.example` to `.env.local` and set the required values:
+
+Copy `.env.example` to `.env` and set the required values:
 
 ```bash
-# Copy example env file
-cp .env.example .env.local
+cp .env.example .env
+```
 
-# Update the following values in .env.local
+Update the following values in .env.local
+
+```bash
 KOSI_SUPABASE_PASSWORD=your_password
 KOSI_SUPABASE_HOST=localhost
 KOSI_SUPABASE_PORT=54322
@@ -54,7 +57,7 @@ KOSI_SUPABASE_USER=postgres
 KOSI_SUPABASE_DATABASE=postgres
 ```
 
-4. Run Supabase services locally & create tables
+4. Run Supabase service locally & create tables
 
 ```bash
 # Ensure Docker/Podman (or other container service) is running
