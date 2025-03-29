@@ -7,7 +7,7 @@ interface EntryActionsProps {
 export default function EntryActions({
   onDelete,
   onEdit,
-  isDeleting,
+  isDeleting
 }: EntryActionsProps) {
   return (
     <>

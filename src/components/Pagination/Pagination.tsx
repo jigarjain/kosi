@@ -9,13 +9,13 @@ export default function Pagination() {
   const nextPage = getNextPageSlug(currentPageSlug);
   const previousPage = getPreviousPageSlug(currentPageSlug);
   const month = new Date(currentPageSlug).toLocaleString("default", {
-    month: "short",
+    month: "short"
   });
   const day = new Date(currentPageSlug).toLocaleString("default", {
-    day: "2-digit",
+    day: "2-digit"
   });
   const year = new Date(currentPageSlug).toLocaleString("default", {
-    year: "numeric",
+    year: "numeric"
   });
 
   return (
@@ -39,7 +39,7 @@ export default function Pagination() {
               <span
                 style={
                   {
-                    ["--value" as string]: day,
+                    ["--value" as string]: day
                   } as React.CSSProperties
                 }
               >

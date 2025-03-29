@@ -54,7 +54,7 @@ export function createNewPage(pageSlug: string): Page {
     slug: pageSlug,
     entries: [],
     createdAt: new Date(),
-    updatedAt: new Date(),
+    updatedAt: new Date()
   };
 }
 
@@ -67,6 +67,6 @@ export function createNewEntry(entryText: string): Entry {
     id: crypto.randomUUID(),
     content: entryText,
     createdAt: new Date(),
-    updatedAt: new Date(),
+    updatedAt: new Date()
   };
 }

@@ -1,6 +1,6 @@
 export default function Modal({
   ref,
-  children,
+  children
 }: {
   ref: React.RefObject<HTMLDialogElement | null>;
   children: Readonly<React.ReactNode>;

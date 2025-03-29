@@ -9,7 +9,7 @@ import Header from "@/components/Header";
 import DevTools from "@/components/DevTools";
 
 export default function App({
-  children,
+  children
 }: Readonly<{
   children: React.ReactNode;
 }>) {
@@ -26,7 +26,7 @@ export default function App({
   const appState = useMemo(
     () => ({
       ...defaultAppState,
-      currentPageSlug,
+      currentPageSlug
     }),
     [currentPageSlug]
   );
@@ -40,9 +40,9 @@ export default function App({
             staleTime: 60 * 1000,
             retry: 1,
             refetchOnWindowFocus: false,
-            refetchOnMount: false,
-          },
-        },
+            refetchOnMount: false
+          }
+        }
       })
   );
 

@@ -16,7 +16,7 @@ export const getDB = async () => {
       if (!db.objectStoreNames.contains(PAGES_STORE)) {
         db.createObjectStore(PAGES_STORE, { keyPath: "id" });
       }
-    },
+    }
   });
 };
 
@@ -63,5 +63,5 @@ export const dbOperations = {
   deleteEntry: async (entryId: string): Promise<void> => {
     const db = await getDB();
     await db.delete(ENTRIES_STORE, entryId);
-  },
+  }
 };
