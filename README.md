@@ -47,17 +47,7 @@ Copy `.env.example` to `.env` and set the required values:
 cp .env.example .env
 ```
 
-Update the following values in .env.local
-
-```bash
-KOSI_SUPABASE_PASSWORD=your_password
-KOSI_SUPABASE_HOST=localhost
-KOSI_SUPABASE_PORT=54322
-KOSI_SUPABASE_USER=postgres
-KOSI_SUPABASE_DATABASE=postgres
-```
-
-4. Run Supabase service locally & create tables
+4. Run Supabase service locally & copy the displayed values into `.env` file
 
 ```bash
 # Ensure Docker/Podman (or other container service) is running
@@ -66,6 +56,15 @@ npx supabase migration up
 ```
 
 Open [http://127.0.0.1:54323](http://127.0.0.1:54323) with your browser to see Supabase dashboard.
+
+5. Set .env values
+
+Copy the `API URL` & `service_role key` displayed in terminal after running the `npx supabase start` command into `.env` file
+
+```bash
+KOSI_SUPABASE_API_URL=
+KOSI_SUPABASE_SERVICE_ROLE_KEY=
+```
 
 5. Run the Next.js development server:
 
