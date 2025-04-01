@@ -1,23 +1,49 @@
 import { useRef } from "react";
-import { useAppState } from "@/context/AppState";
-import { useUpdateEntry } from "@/hooks/api/entries";
-import { useDeleteEntry } from "@/hooks/api/entries";
-import Entry from "@/types/Entry";
+import { LocalEntry } from "@/types/Entry";
 import Modal from "@/components/Modal";
 import EntryInput from "@/components/EntryInput";
 import EntryActions from "./EntryActions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import Store from "@/store";
 
-export default function EntryItem({ entry }: { entry: Entry }) {
-  const { currentPageSlug } = useAppState();
-  const deleteEntry = useDeleteEntry();
-  const updateEntry = useUpdateEntry();
+interface DeleteEntryParams {
+  entryId: string;
+}
+
+export default function EntryItem({ entry }: { entry: LocalEntry }) {
+  const queryClient = useQueryClient();
   const modalRef = useRef<HTMLDialogElement>(null);
+
+  const deleteEntry = useMutation<void, Error, DeleteEntryParams>({
+    mutationFn: async ({ entryId }: DeleteEntryParams) => {
+      return Store.deleteEntry(entryId);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["entries"] });
+    }
+  });
+
+  const updateEntry = useMutation<LocalEntry, Error, LocalEntry>({
+    mutationFn: async (entry: LocalEntry) => {
+      const updatedEntry = {
+        ...entry,
+        updated_at: new Date()
+      };
+      return Store.updateEntry(updatedEntry);
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ["entries"] });
+      queryClient.invalidateQueries({ queryKey: ["entries", variables.id] });
+      queryClient.invalidateQueries({
+        queryKey: ["entries", "byPageId", variables.page_id]
+      });
+    }
+  });
 
   const handleDelete = async () => {
     try {
       await deleteEntry.mutateAsync({
-        entryId: entry.id,
-        pageSlug: currentPageSlug
+        entryId: entry.id
       });
     } catch (error) {
       console.error("Failed to delete entry:", error);

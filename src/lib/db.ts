@@ -1,14 +1,20 @@
 import { openDB } from "idb";
-import Page from "@/types/Page";
-import Entry from "@/types/Entry";
+import { LocalPage } from "@/types/Page";
+import { LocalEntry } from "@/types/Entry";
+import { convertToPageDate } from "./utils";
 
-export const DB_NAME = "kosi-dev";
+export const DB_NAME = "kosi-local";
+export const USERS_STORE = "users";
 export const PAGES_STORE = "pages";
 export const ENTRIES_STORE = "entries";
 
 export const getDB = async () => {
   return openDB(DB_NAME, 1, {
     upgrade(db) {
+      if (!db.objectStoreNames.contains(USERS_STORE)) {
+        db.createObjectStore(USERS_STORE, { keyPath: "id" });
+      }
+
       if (!db.objectStoreNames.contains(ENTRIES_STORE)) {
         db.createObjectStore(ENTRIES_STORE, { keyPath: "id" });
       }
@@ -21,43 +27,65 @@ export const getDB = async () => {
 };
 
 export const dbOperations = {
-  getPage: async (pageId: string): Promise<Page | null> => {
+  getPage: async (pageId: string): Promise<LocalPage | null> => {
     const db = await getDB();
     const result = await db.get(PAGES_STORE, pageId);
-    return (result as Page) || null;
+    return (result as LocalPage) || null;
   },
 
-  getPageBySlug: async (pageSlug: string): Promise<Page | null> => {
+  getPageByDate: async (pageDate: string): Promise<LocalPage | null> => {
     const db = await getDB();
     const allPages = await db.getAll(PAGES_STORE);
-    const result = allPages.find((page) => page.slug === pageSlug);
-    return (result as Page) || null;
+    const result = allPages.find((page) => {
+      return convertToPageDate(page.created_at) === pageDate;
+    });
+
+    return (result as LocalPage) || null;
   },
 
-  addPage: async (page: Page): Promise<void> => {
+  addPage: async (page: LocalPage): Promise<LocalPage> => {
+    const db = await getDB();
+    await db.put(PAGES_STORE, page);
+    return page;
+  },
+
+  updatePage: async (page: LocalPage): Promise<void> => {
     const db = await getDB();
     await db.put(PAGES_STORE, page);
   },
 
-  updatePage: async (page: Page): Promise<void> => {
-    const db = await getDB();
-    await db.put(PAGES_STORE, page);
-  },
-
-  getEntry: async (entryId: string): Promise<Entry | null> => {
+  getEntry: async (entryId: string): Promise<LocalEntry | null> => {
     const db = await getDB();
     const result = await db.get(ENTRIES_STORE, entryId);
-    return (result as Entry) || null;
+    return (result as LocalEntry) || null;
   },
 
-  addEntry: async (entry: Entry): Promise<void> => {
+  getEntriesByPageId: async (pageId: string): Promise<LocalEntry[]> => {
     const db = await getDB();
-    await db.put(ENTRIES_STORE, entry);
+    const result = await db.getAll(ENTRIES_STORE);
+    return result.filter((entry) => entry.page_id === pageId) as LocalEntry[];
   },
 
-  updateEntry: async (entry: Entry): Promise<void> => {
+  getEntriesByPageDate: async (pageDate: string): Promise<LocalEntry[]> => {
+    const page = await dbOperations.getPageByDate(pageDate);
+
+    if (!page) {
+      return [];
+    }
+
+    return await dbOperations.getEntriesByPageId(page.id);
+  },
+
+  addEntry: async (entry: LocalEntry): Promise<LocalEntry> => {
     const db = await getDB();
     await db.put(ENTRIES_STORE, entry);
+    return entry;
+  },
+
+  updateEntry: async (entry: LocalEntry): Promise<LocalEntry> => {
+    const db = await getDB();
+    await db.put(ENTRIES_STORE, entry);
+    return entry;
   },
 
   deleteEntry: async (entryId: string): Promise<void> => {
