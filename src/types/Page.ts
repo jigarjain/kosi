@@ -1,9 +1,15 @@
-import Entry from "./Entry";
+import { User } from "./User";
 
-export default interface Page {
+export interface Page {
   id: string;
-  slug: string;
-  entries: Entry["id"][];
-  createdAt: Date;
-  updatedAt: Date;
+  user_id: User["id"];
+  created_at: Date;
+  updated_at: Date;
+}
+
+export interface LocalPage {
+  id: Page["id"];
+  user_id: Page["user_id"];
+  created_at: Page["created_at"];
+  updated_at: Page["updated_at"];
 }

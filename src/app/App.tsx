@@ -1,10 +1,8 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { AppStateContext, defaultAppState } from "@/context/AppState";
-import { validatePageSlug } from "@/lib/utils";
+import { AppStateProvider } from "@/context/AppState";
 import Header from "@/components/Header";
 import DevTools from "@/components/DevTools";
 
@@ -13,32 +11,14 @@ export default function App({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const { pageSlug } = useParams();
-  const [currentPageSlug, setCurrentPageSlug] = useState(pageSlug as string);
-
-  // Update currentPage when route changes
-  useEffect(() => {
-    if (pageSlug && validatePageSlug(pageSlug as string)) {
-      setCurrentPageSlug(pageSlug as string);
-    }
-  }, [pageSlug]);
-
-  const appState = useMemo(
-    () => ({
-      ...defaultAppState,
-      currentPageSlug
-    }),
-    [currentPageSlug]
-  );
-
   // To prevent creating a new query client on every render
   const [queryClient] = useState(
     () =>
       new QueryClient({
         defaultOptions: {
           queries: {
-            staleTime: 60 * 1000,
-            retry: 1,
+            staleTime: Infinity,
+            retry: 0,
             refetchOnWindowFocus: false,
             refetchOnMount: false
           }
@@ -48,11 +28,11 @@ export default function App({
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppStateContext.Provider value={appState}>
+      <AppStateProvider>
         <Header />
         {children}
         <DevTools />
-      </AppStateContext.Provider>
+      </AppStateProvider>
     </QueryClientProvider>
   );
 }

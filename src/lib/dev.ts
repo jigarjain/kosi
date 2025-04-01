@@ -1,4 +1,3 @@
-import { convertToPageSlug } from "./utils";
 import { getDB, PAGES_STORE, ENTRIES_STORE } from "./db";
 const entries = [
   {
@@ -69,22 +68,16 @@ const entries = [
 const pages = [
   {
     id: crypto.randomUUID(),
-    slug: convertToPageSlug(new Date(Date.now() - 48 * 60 * 60 * 1000)),
-    entries: entries.slice(0, 3).map((entry) => entry.id),
     createdAt: new Date(Date.now() - 48 * 60 * 60 * 1000),
     updatedAt: new Date()
   },
   {
     id: crypto.randomUUID(),
-    slug: convertToPageSlug(new Date(Date.now() - 24 * 60 * 60 * 1000)),
-    entries: entries.slice(3, 6).map((entry) => entry.id),
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000),
     updatedAt: new Date()
   },
   {
     id: crypto.randomUUID(),
-    slug: convertToPageSlug(new Date()),
-    entries: entries.slice(6, 9).map((entry) => entry.id),
     createdAt: new Date(),
     updatedAt: new Date()
   }
