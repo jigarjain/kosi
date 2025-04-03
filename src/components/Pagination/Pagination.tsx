@@ -21,7 +21,7 @@ export default function Pagination() {
   });
 
   return (
-    <div className="grid grid-cols-3 items-center gap-4 px-4 py-2">
+    <div className="grid grid-cols-3 items-center gap-4 px-4">
       <div className="flex justify-start">
         {previousPage && (
           <Link
@@ -34,9 +34,9 @@ export default function Pagination() {
         )}
       </div>
       <div className="text-center text-sm text-neutral flex items-center justify-center">
-        <div className="flex flex-col items-center text-center">
+        <div className="flex items-center font-bold text-center">
           <div className="uppercase text-sm tracking-wider">{month}</div>
-          <div className="countdown text-4xl font-bold leading-none">
+          <div className="countdown text-4xl font-bold leading-none px-2">
             <span
               style={
                 {

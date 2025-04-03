@@ -3,13 +3,13 @@
 import { useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAppState } from "@/context/AppState";
-import EntryInput from "@/components/EntryInput";
-import Modal from "@/components/Modal";
-import { convertToPageDate, createNewEntry, createNewPage } from "@/lib/utils";
 import { LocalEntry } from "@/types/Entry";
 import { LocalPage } from "@/types/Page";
+import { convertToPageDate, createNewEntry, createNewPage } from "@/lib/utils";
+import { useAppState } from "@/context/AppState";
 import Store from "@/store";
+import EntryInput from "@/components/EntryInput";
+import Modal from "@/components/Modal";
 
 interface AddEntryParams {
   entryText: string;
@@ -21,6 +21,7 @@ export default function ActionsMenu() {
   const queryParams = useSearchParams();
   const queryClient = useQueryClient();
   const date = queryParams.get("date");
+  const modalRef = useRef<HTMLDialogElement>(null);
 
   const addNewEntryMutation = useMutation<LocalEntry, Error, AddEntryParams>({
     mutationFn: async ({ entryText, pageId }: AddEntryParams) => {
@@ -40,8 +41,6 @@ export default function ActionsMenu() {
       queryClient.invalidateQueries({ queryKey: ["pages"] });
     }
   });
-
-  const modalRef = useRef<HTMLDialogElement>(null);
 
   const onSubmit = useCallback(
     async (entry: string) => {

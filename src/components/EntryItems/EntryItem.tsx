@@ -1,10 +1,10 @@
 import { useRef } from "react";
-import { LocalEntry } from "@/types/Entry";
-import Modal from "@/components/Modal";
-import EntryInput from "@/components/EntryInput";
-import EntryActions from "./EntryActions";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { LocalEntry } from "@/types/Entry";
 import Store from "@/store";
+import EntryInput from "@/components/EntryInput";
+import Modal from "@/components/Modal";
+import EntryActions from "./EntryActions";
 
 interface DeleteEntryParams {
   entryId: string;
