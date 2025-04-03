@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppStateProvider } from "@/context/AppState";
-import Header from "@/components/Header";
 import DevTools from "@/components/DevTools";
+import Header from "@/components/Header";
 
 export default function App({
   children

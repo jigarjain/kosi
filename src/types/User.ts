@@ -19,5 +19,4 @@ export interface LocalUser {
   username?: User["username"];
   created_at: User["created_at"];
   updated_at: User["updated_at"];
-  is_local: boolean;
 }

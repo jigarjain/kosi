@@ -1,49 +1,78 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createJWT } from "@/lib/auth";
+import {
+  CreateSessionResponseDto,
+  GetAuthRequestSchema,
+  GetAuthResponseDto,
+  SessionRequestSchema
+} from "@/types/dto.types";
 import { supabaseClient } from "@/lib/supabase";
+import { PGHexToBase64, base64ToPGHex } from "@/lib/utils";
+import { JWT_Payload, createJWT } from "@/app/api/auth/auth.helper";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
-  const username = searchParams.get("username");
 
-  if (!username?.length) {
+  // Validate using Zod
+  const result = GetAuthRequestSchema.safeParse({
+    username: searchParams.get("username")
+  });
+
+  if (!result.success) {
     return NextResponse.json(
-      { error: "Username is required" },
+      { error: "Validation error", details: result.error.format() },
       { status: 400 }
     );
   }
 
+  const { username } = result.data;
+
   const { data, error } = await supabaseClient
     .from("users")
-    .select("id, encrypted_dek_mk, password_salt, authkey_salt")
-    .eq("username", username);
+    .select<
+      string,
+      GetAuthResponseDto
+    >("id, encrypted_dek_mk, iv_mk, password_salt, authkey_salt")
+    .eq("username", username)
+    .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data);
+  const formattedData: GetAuthResponseDto = {
+    id: data.id,
+    encrypted_dek_mk: PGHexToBase64(data.encrypted_dek_mk),
+    iv_mk: PGHexToBase64(data.iv_mk),
+    password_salt: PGHexToBase64(data.password_salt),
+    authkey_salt: PGHexToBase64(data.authkey_salt)
+  };
+
+  return NextResponse.json(formattedData);
 }
 
 export async function POST(request: NextRequest) {
-  const body = await request.json();
-  const { user_id, hashed_authkey } = body;
+  const body: unknown = await request.json();
 
-  if (!user_id || !hashed_authkey) {
+  // Validate using Zod
+  const result = SessionRequestSchema.safeParse(body);
+
+  if (!result.success) {
     return NextResponse.json(
-      { error: "user_id and hashed_authkey are required" },
+      { error: "Validation error", details: result.error.format() },
       { status: 400 }
     );
   }
 
+  const { id, hashed_authkey } = result.data;
+
   const { data, error } = await supabaseClient
     .from("users")
-    .select("id")
-    .eq("id", user_id)
-    .eq("hashed_authkey", hashed_authkey)
-    .limit(1);
+    .select<string, JWT_Payload>("id, username, name, created_at, updated_at")
+    .eq("id", id)
+    .eq("hashed_authkey", base64ToPGHex(hashed_authkey))
+    .single();
 
-  if (error || !data.length) {
+  if (error || !data) {
     return NextResponse.json(
       { error: "Error generating authentication token" },
       { status: 500 }
@@ -51,12 +80,12 @@ export async function POST(request: NextRequest) {
   }
 
   const jwt = createJWT({
-    user_id: data[0].id
+    ...data
   });
 
-  return NextResponse.json({
-    data: {
-      token: jwt
-    }
-  });
+  const tokenResponse: CreateSessionResponseDto = {
+    jwt_token: jwt
+  };
+
+  return NextResponse.json(tokenResponse);
 }

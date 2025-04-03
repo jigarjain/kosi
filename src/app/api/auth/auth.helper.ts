@@ -9,14 +9,19 @@ if (!KOSI_AUTH_SECRET) {
 }
 
 export type JWT_Payload = {
-  user_id: string;
+  id: string;
+  username: string;
+  name: string;
+  created_at: Date;
+  updated_at: Date;
 };
 
-export const verifyJWT = (token: string) => {
+export const verifyJWT = (token: string): JWT_Payload | null => {
   const decoded = jwt.verify(token, KOSI_AUTH_SECRET, {
     algorithms: [ALGORITHM]
   });
-  return decoded;
+
+  return decoded as JWT_Payload;
 };
 
 export const createJWT = (payload: JWT_Payload) => {

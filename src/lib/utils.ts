@@ -70,3 +70,35 @@ export function createNewEntry(entryText: string, pageId: string): LocalEntry {
     updated_at: new Date()
   };
 }
+
+/**
+ * Converts a Uint8Array to a Base64 string
+ * @param uint8Array - The Uint8Array to convert
+ */
+export function uint8ArrayToBase64(uint8Array: Uint8Array): string {
+  // Create a Buffer view directly over the Uint8Array's underlying ArrayBuffer
+  return Buffer.from(uint8Array).toString("base64");
+}
+
+/**
+ * Converts a Base64 string to a Uint8Array
+ * @param base64 - The Base64 string to convert
+ */
+export function base64ToUint8Array(base64: string): Uint8Array {
+  return new Uint8Array(Buffer.from(base64, "base64"));
+}
+
+export function PGHexToBase64(hex: string): string {
+  if (hex.startsWith("\\x")) {
+    hex = hex.slice(2); // Remove the "\x" prefix
+  }
+
+  const uint8Array = Buffer.from(hex, "hex");
+
+  return uint8ArrayToBase64(uint8Array);
+}
+
+export function base64ToPGHex(base64: string): string {
+  const buffer = Buffer.from(base64, "base64");
+  return `\\x${buffer.toString("hex")}`;
+}

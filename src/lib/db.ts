@@ -1,12 +1,14 @@
 import { openDB } from "idb";
-import { LocalPage } from "@/types/Page";
 import { LocalEntry } from "@/types/Entry";
+import { LocalPage } from "@/types/Page";
+import { LocalUser } from "@/types/User";
 import { convertToPageDate } from "./utils";
 
 export const DB_NAME = "kosi-local";
 export const USERS_STORE = "users";
 export const PAGES_STORE = "pages";
 export const ENTRIES_STORE = "entries";
+export const AUTH_STORE = "auth";
 
 export const getDB = async () => {
   return openDB(DB_NAME, 1, {
@@ -21,6 +23,10 @@ export const getDB = async () => {
 
       if (!db.objectStoreNames.contains(PAGES_STORE)) {
         db.createObjectStore(PAGES_STORE, { keyPath: "id" });
+      }
+
+      if (!db.objectStoreNames.contains(AUTH_STORE)) {
+        db.createObjectStore(AUTH_STORE, { autoIncrement: true });
       }
     }
   });
@@ -91,5 +97,45 @@ export const dbOperations = {
   deleteEntry: async (entryId: string): Promise<void> => {
     const db = await getDB();
     await db.delete(ENTRIES_STORE, entryId);
+  },
+
+  getLocalUser: async (): Promise<LocalUser | null> => {
+    const db = await getDB();
+    const result = await db.getAll(USERS_STORE);
+
+    return result?.[0] || null;
+  },
+
+  updateLocalUser: async (user: LocalUser): Promise<LocalUser> => {
+    const db = await getDB();
+    await db.put(USERS_STORE, user);
+    return user;
+  },
+
+  deleteLocalUser: async (): Promise<void> => {
+    const db = await getDB();
+    const transaction = db.transaction(USERS_STORE, "readwrite");
+    const objectStore = transaction.objectStore(USERS_STORE);
+    await objectStore.clear();
+  },
+
+  storeLocalAuth: async (auth: unknown): Promise<void> => {
+    const db = await getDB();
+    await dbOperations.deleteLocalAuth();
+    await db.put(AUTH_STORE, auth);
+  },
+
+  getLocalAuth: async (): Promise<unknown | null> => {
+    const db = await getDB();
+    const result = await db.getAll(AUTH_STORE);
+    return result?.[0] || null;
+  },
+
+  deleteLocalAuth: async (): Promise<void> => {
+    const db = await getDB();
+    const transaction = db.transaction(AUTH_STORE, "readwrite");
+    const objectStore = transaction.objectStore(AUTH_STORE);
+    // Clear all entries
+    await objectStore.clear();
   }
 };

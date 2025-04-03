@@ -1,10 +1,10 @@
 "use client";
 
-import { useAppState } from "@/context/AppState";
-import EntryItem from "./EntryItem";
-import { LocalEntry } from "@/types/Entry";
 import { useQuery } from "@tanstack/react-query";
+import { LocalEntry } from "@/types/Entry";
+import { useAppState } from "@/context/AppState";
 import Store from "@/store";
+import EntryItem from "./EntryItem";
 
 function NoEntries() {
   return <div className="text-center text-sm text-neutral">No entries</div>;

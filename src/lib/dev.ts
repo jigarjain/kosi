@@ -1,4 +1,5 @@
-import { getDB, PAGES_STORE, ENTRIES_STORE } from "./db";
+import { ENTRIES_STORE, PAGES_STORE, getDB } from "./db";
+
 const entries = [
   {
     id: crypto.randomUUID(),
