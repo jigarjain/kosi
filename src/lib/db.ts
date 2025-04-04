@@ -33,6 +33,12 @@ export const getDB = async () => {
 };
 
 export const dbOperations = {
+  getAllPages: async (): Promise<LocalPage[]> => {
+    const db = await getDB();
+    const result = await db.getAll(PAGES_STORE);
+    return result as LocalPage[];
+  },
+
   getPage: async (pageId: string): Promise<LocalPage | null> => {
     const db = await getDB();
     const result = await db.get(PAGES_STORE, pageId);
@@ -82,6 +88,13 @@ export const dbOperations = {
     return await dbOperations.getEntriesByPageId(page.id);
   },
 
+  clearPageStore: async (): Promise<void> => {
+    const db = await getDB();
+    const transaction = db.transaction(PAGES_STORE, "readwrite");
+    const objectStore = transaction.objectStore(PAGES_STORE);
+    await objectStore.clear();
+  },
+
   addEntry: async (entry: LocalEntry): Promise<LocalEntry> => {
     const db = await getDB();
     await db.put(ENTRIES_STORE, entry);
@@ -99,6 +112,13 @@ export const dbOperations = {
     await db.delete(ENTRIES_STORE, entryId);
   },
 
+  clearEntryStore: async (): Promise<void> => {
+    const db = await getDB();
+    const transaction = db.transaction(ENTRIES_STORE, "readwrite");
+    const objectStore = transaction.objectStore(ENTRIES_STORE);
+    await objectStore.clear();
+  },
+
   getLocalUser: async (): Promise<LocalUser | null> => {
     const db = await getDB();
     const result = await db.getAll(USERS_STORE);
@@ -112,7 +132,7 @@ export const dbOperations = {
     return user;
   },
 
-  deleteLocalUser: async (): Promise<void> => {
+  clearUserStore: async (): Promise<void> => {
     const db = await getDB();
     const transaction = db.transaction(USERS_STORE, "readwrite");
     const objectStore = transaction.objectStore(USERS_STORE);
@@ -121,7 +141,6 @@ export const dbOperations = {
 
   storeLocalAuth: async (auth: unknown): Promise<void> => {
     const db = await getDB();
-    await dbOperations.deleteLocalAuth();
     await db.put(AUTH_STORE, auth);
   },
 
@@ -131,7 +150,7 @@ export const dbOperations = {
     return result?.[0] || null;
   },
 
-  deleteLocalAuth: async (): Promise<void> => {
+  clearAuthStore: async (): Promise<void> => {
     const db = await getDB();
     const transaction = db.transaction(AUTH_STORE, "readwrite");
     const objectStore = transaction.objectStore(AUTH_STORE);

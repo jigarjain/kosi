@@ -50,27 +50,23 @@ export const SessionResponseSchema = z.object({
 
 // Page-related schemas
 export const GetPageRequestSchema = z.object({
-  page_date: z.string().optional(),
-  page_id: z.string().uuid("`page_id` must be a valid UUID").optional(),
-  page: z
-    .string()
-    .optional()
-    .transform((val) => (val ? parseInt(val, 10) : 1))
+  date: z.string().optional()
 });
 
 export const EntrySchema = z.object({
   id: z.string().uuid("`id` must be a valid UUID"),
   content: z.string(),
   iv: z.string(),
-  created_at: z.string().nullable(),
-  updated_at: z.string().nullable(),
-  page_id: z.string().uuid().optional()
+  created_at: z.string().datetime("`created_at` must be a valid date"),
+  updated_at: z.string().datetime("`updated_at` must be a valid date"),
+  page_id: z.string().uuid("`page_id` must be a valid UUID")
 });
 
 export const PageSchema = z.object({
   id: z.string().uuid("`id` must be a valid UUID"),
-  created_at: z.string().nullable(),
-  updated_at: z.string().nullable(),
+  user_id: z.string().uuid("`user_id` must be a valid UUID"),
+  created_at: z.string().datetime("`created_at` must be a valid date"),
+  updated_at: z.string().datetime("`updated_at` must be a valid date"),
   entries: z.array(EntrySchema)
 });
 
@@ -82,8 +78,7 @@ export const PaginationSchema = z.object({
 });
 
 export const GetPagesResponseSchema = z.object({
-  pages: z.array(PageSchema),
-  pagination: PaginationSchema.optional()
+  pages: z.array(PageSchema)
 });
 
 export const CreatePageRequestSchema = z.object({

@@ -1,25 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseClient } from "@/lib/supabase";
-import { verifyJWT } from "./api/auth/auth.helper";
+import { AUTH_USER_ID_HEADER, verifyJWT } from "@/app/api/auth/auth.helper";
 
-export default async function middleware(request: NextRequest) {
-  console.log("middleware path:", request.nextUrl.pathname);
+export async function middleware(request: NextRequest) {
+  console.log("[Middleware] URL:", request.url);
   const jwt = request.headers.get("Authorization")?.split(" ")[1];
 
   if (!jwt) {
+    console.log("[Middleware] No Authorization JWT found");
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const decoded = verifyJWT(jwt);
-
-  console.log("Decoded JWT", decoded);
+  const decoded = await verifyJWT(jwt);
 
   if (!decoded) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  // Set the user id in the request object as additional metadata
-  request.nextUrl.searchParams.set("authorizedUserId", decoded.id);
+  const newHeaders = new Headers(request.headers);
+  console.log(`[Middleware] Setting ${AUTH_USER_ID_HEADER}:`, decoded.id);
+  newHeaders.set(AUTH_USER_ID_HEADER, decoded.id);
 
   // For routes that include specific pageId, verify the user owns the page
   const segments = request.nextUrl.pathname.split("/");
@@ -30,10 +30,18 @@ export default async function middleware(request: NextRequest) {
 
     // Skip validation for new page creation or route files
     if (pageId === "route" || pageId === "index") {
-      return NextResponse.next();
+      return NextResponse.next({
+        request: {
+          headers: newHeaders
+        }
+      });
     }
 
-    console.log("Validating page ownership for pageId:", pageId);
+    console.log(
+      "Validating page ownership for pageId: & user_id: ",
+      pageId,
+      decoded.id
+    );
 
     // Query the database to check if the page belongs to the user
     const { data, error } = await supabaseClient
@@ -49,9 +57,13 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  return NextResponse.next({
+    request: {
+      headers: newHeaders
+    }
+  });
 }
 
 export const config = {
-  matcher: ["/api/pages", "/api/pages/:path*"]
+  matcher: ["/api/pages(.*)"]
 };

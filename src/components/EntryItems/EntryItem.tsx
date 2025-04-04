@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { LocalEntry } from "@/types/Entry";
 import Store from "@/store";
@@ -7,6 +7,7 @@ import Modal from "@/components/Modal";
 import EntryActions from "./EntryActions";
 
 interface DeleteEntryParams {
+  pageId: string;
   entryId: string;
 }
 
@@ -15,11 +16,14 @@ export default function EntryItem({ entry }: { entry: LocalEntry }) {
   const modalRef = useRef<HTMLDialogElement>(null);
 
   const deleteEntry = useMutation<void, Error, DeleteEntryParams>({
-    mutationFn: async ({ entryId }: DeleteEntryParams) => {
-      return Store.deleteEntry(entryId);
+    mutationFn: async ({ pageId, entryId }: DeleteEntryParams) => {
+      return Store.deleteEntry(pageId, entryId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["entries"] });
+    },
+    onError: (error) => {
+      console.error("Failed to delete entry:", error);
     }
   });
 
@@ -37,31 +41,34 @@ export default function EntryItem({ entry }: { entry: LocalEntry }) {
       queryClient.invalidateQueries({
         queryKey: ["entries", "byPageId", variables.page_id]
       });
+
+      modalRef.current?.close();
+    },
+    onError: (error) => {
+      console.error("Failed to update entry:", error);
     }
   });
 
-  const handleDelete = async () => {
-    try {
-      await deleteEntry.mutateAsync({
-        entryId: entry.id
-      });
-    } catch (error) {
-      console.error("Failed to delete entry:", error);
-    }
-  };
+  const handleDelete = useCallback(async () => {
+    deleteEntry.mutate({
+      pageId: entry.page_id,
+      entryId: entry.id
+    });
+  }, [deleteEntry, entry.id, entry.page_id]);
 
   const handleEdit = () => {
     modalRef.current?.showModal();
   };
 
-  const handleUpdate = async (entryText: string) => {
-    await updateEntry.mutateAsync({
-      ...entry,
-      content: entryText
-    });
-
-    modalRef.current?.close();
-  };
+  const handleUpdate = useCallback(
+    async (entryText: string) => {
+      updateEntry.mutate({
+        ...entry,
+        content: entryText
+      });
+    },
+    [updateEntry, entry]
+  );
 
   return (
     <>

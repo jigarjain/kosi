@@ -43,8 +43,12 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const [localAuth, setLocalAuth] = useState<LocalAuth | null>(null);
 
   const handleLogout = useCallback(async () => {
-    await Store.deleteLocalAuth();
-    await Store.deleteLocalUser();
+    await Promise.all([
+      Store.clearAuthStore(),
+      Store.clearUserStore(),
+      Store.clearPageStore(),
+      Store.clearPageStore()
+    ]);
     setLocalAuth(null);
     setCurrentUser(null);
   }, [setLocalAuth, setCurrentUser]);
