@@ -7,7 +7,11 @@ import Store from "@/store";
 import EntryItem from "./EntryItem";
 
 function NoEntries() {
-  return <div className="text-center text-sm text-neutral">No entries</div>;
+  return (
+    <div className="flex items-center justify-center h-full min-h-[500px] text-center text-sm">
+      No entries yet
+    </div>
+  );
 }
 
 export default function EntryItems() {

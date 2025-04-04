@@ -7,7 +7,7 @@ import {
 } from "@/types/dto.types";
 import { supabaseClient } from "@/lib/supabase";
 import { PGHexToBase64, base64ToPGHex } from "@/lib/utils";
-import { JWT_Payload, createJWT } from "@/app/api/auth/auth.helper";
+import { JWTUserPayload, createJWT } from "@/app/api/auth/auth.helper";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -67,7 +67,10 @@ export async function POST(request: NextRequest) {
 
   const { data, error } = await supabaseClient
     .from("users")
-    .select<string, JWT_Payload>("id, username, name, created_at, updated_at")
+    .select<
+      string,
+      JWTUserPayload
+    >("id, username, name, created_at, updated_at")
     .eq("id", id)
     .eq("hashed_authkey", base64ToPGHex(hashed_authkey))
     .single();
@@ -79,7 +82,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const jwt = createJWT({
+  const jwt = await createJWT({
     ...data
   });
 

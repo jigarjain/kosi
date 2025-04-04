@@ -30,6 +30,7 @@ export default function ActionsMenu() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["entries"] });
+      modalRef.current?.close();
     }
   });
 
@@ -53,17 +54,10 @@ export default function ActionsMenu() {
         newPage = await addNewPageMutation.mutateAsync(tempPage);
       }
 
-      await addNewEntryMutation.mutateAsync(
-        {
-          entryText: entry,
-          pageId: newPage!.id
-        },
-        {
-          onSuccess: () => {
-            modalRef.current?.close();
-          }
-        }
-      );
+      addNewEntryMutation.mutate({
+        entryText: entry,
+        pageId: newPage!.id
+      });
     },
     [addNewEntryMutation, addNewPageMutation, date, currentPage, currentUser]
   );

@@ -1,6 +1,6 @@
 import { generateMnemonic, mnemonicToSeedSync } from "bip39";
 import jwt from "jsonwebtoken";
-import { JWT_Payload } from "@/app/api/auth/auth.helper";
+import { JWTUserPayload } from "@/app/api/auth/auth.helper";
 
 /**
  * Generates a cryptographically secure random salt
@@ -271,7 +271,7 @@ export async function decryptData(
  * @param token - The JWT token string to decode
  * @returns The decoded JWT payload, or null if the token is invalid
  */
-export function decodeJWT(token: string): JWT_Payload | null {
+export function decodeJWT(token: string): JWTUserPayload | null {
   const decoded = jwt.decode(token);
 
   if (!decoded || typeof decoded === "string") {
@@ -282,5 +282,7 @@ export function decodeJWT(token: string): JWT_Payload | null {
     return null;
   }
 
-  return decoded as JWT_Payload;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { exp, iat, ...rest } = decoded;
+  return rest as JWTUserPayload;
 }
