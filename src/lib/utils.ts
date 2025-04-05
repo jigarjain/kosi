@@ -15,10 +15,12 @@ export function validatePageDate(pageDate: string): boolean {
  * @param date - The date to convert
  */
 export function convertToPageDate(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
+  const str = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(
     2,
     "0"
   )}-${String(date.getDate()).padStart(2, "0")}`;
+
+  return str;
 }
 
 /**
@@ -49,11 +51,17 @@ export function getNextPageDateString(currentPageDate: Date): string | null {
  * @param pageDate - The date for the new page
  */
 export function createNewPage(pageDate: string, userId: string): LocalPage {
+  console.log("Creating new page", pageDate, new Date(pageDate));
+
   return {
     id: crypto.randomUUID(),
     user_id: userId,
-    created_at: new Date(pageDate),
-    updated_at: new Date(pageDate)
+    created_at: new Date(
+      `${pageDate}T${new Date().toISOString().split("T")[1]}`
+    ),
+    updated_at: new Date(
+      `${pageDate}T${new Date().toISOString().split("T")[1]}`
+    )
   };
 }
 

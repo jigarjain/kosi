@@ -17,13 +17,13 @@ function NoEntries() {
 export default function EntryItems() {
   const { currentPage } = useAppState();
 
-  const { data: entries, isPending } = useQuery<LocalEntry[]>({
+  const { data: entries } = useQuery<LocalEntry[]>({
     queryKey: ["entries", "byPage", currentPage?.id],
     queryFn: async () => Store.getEntriesByPage(currentPage!.id),
     enabled: !!currentPage
   });
 
-  if (!isPending && entries?.length === 0) {
+  if (!entries || entries.length === 0) {
     return <NoEntries />;
   }
 

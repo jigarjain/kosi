@@ -41,13 +41,14 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
   const [currentPage, setCurrentPage] = useState<Page | null>(null);
   const [currentUser, setCurrentUser] = useState<LocalUser | null>(null);
   const [localAuth, setLocalAuth] = useState<LocalAuth | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleLogout = useCallback(async () => {
     await Promise.all([
       Store.clearAuthStore(),
       Store.clearUserStore(),
       Store.clearPageStore(),
-      Store.clearPageStore()
+      Store.clearEntryStore()
     ]);
     setLocalAuth(null);
     setCurrentUser(null);
@@ -62,6 +63,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       ]);
       setCurrentUser(localUser);
       setLocalAuth(localAuth);
+      setIsLoading(false);
     };
 
     setup();
@@ -87,6 +89,10 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       handleLogout
     ]
   );
+
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <AppStateContext.Provider value={appState}>

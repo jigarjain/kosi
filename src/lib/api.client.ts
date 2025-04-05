@@ -12,7 +12,7 @@ export const initializeApiClient = (
     const url = config.url || "";
 
     // Only add auth token for /api/pages* endpoints
-    if (url.startsWith("/pages") || url.startsWith("/api/pages")) {
+    if (url.startsWith("/pages")) {
       const token = await tokenProvider();
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;

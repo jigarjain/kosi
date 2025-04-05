@@ -3,7 +3,6 @@
 import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { AppStateProvider } from "@/context/AppState";
-import DevTools from "@/components/DevTools";
 import Header from "@/components/Header";
 
 export default function App({
@@ -31,7 +30,6 @@ export default function App({
       <AppStateProvider>
         <Header />
         {children}
-        <DevTools />
       </AppStateProvider>
     </QueryClientProvider>
   );
