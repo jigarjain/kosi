@@ -12,7 +12,7 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Params }
 ) {
-  const { pageId } = params;
+  const { pageId } = await params;
 
   // Parse and validate the request body
   const body: unknown = await request.json();

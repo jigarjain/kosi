@@ -97,12 +97,13 @@ export class PageStore {
     }
 
     let response: AxiosResponse<GetPagesResponseDto>;
+
     try {
       response = await apiClient.get<GetPagesResponseDto>(
         `/pages?date=${pageDate}`
       );
     } catch (error) {
-      console.error("Error fetching page by date:", error);
+      console.log("Error fetching page by date:", error);
       return null;
     }
 
@@ -198,6 +199,7 @@ export class PageStore {
     try {
       const page = await this.getPageById(pageId);
       if (!page) {
+        console.log("No page found, returning empty array");
         return [];
       }
 

@@ -179,7 +179,6 @@ export async function POST(request: NextRequest) {
 
     const body: unknown = await request.json();
 
-    // Validate using Zod
     const result = CreatePageRequestSchema.safeParse(body);
 
     if (!result.success) {
