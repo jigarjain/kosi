@@ -75,7 +75,15 @@ export const dbOperations = {
   getEntriesByPageId: async (pageId: string): Promise<LocalEntry[]> => {
     const db = await getDB();
     const result = await db.getAll(ENTRIES_STORE);
-    return result.filter((entry) => entry.page_id === pageId) as LocalEntry[];
+    const entries = result.filter(
+      (entry) => entry.page_id === pageId
+    ) as LocalEntry[];
+
+    return entries.sort((a, b) => {
+      return (
+        new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+      );
+    });
   },
 
   getEntriesByPageDate: async (pageDate: string): Promise<LocalEntry[]> => {

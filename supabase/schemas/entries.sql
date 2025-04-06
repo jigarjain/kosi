@@ -7,8 +7,8 @@ CREATE TABLE entries (
   content BYTEA NOT NULL,
   iv BYTEA NOT NULL,
   
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_entries_id ON entries(id);

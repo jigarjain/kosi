@@ -3,8 +3,8 @@ create table "public"."entries" (
     "page_id" uuid not null,
     "content" bytea not null,
     "iv" bytea not null,
-    "created_at" timestamp without time zone not null default now(),
-    "updated_at" timestamp without time zone not null default now()
+    "created_at" timestamp with time zone not null default now(),
+    "updated_at" timestamp with time zone not null default now()
 );
 
 
@@ -13,8 +13,8 @@ alter table "public"."entries" enable row level security;
 create table "public"."pages" (
     "id" uuid not null default gen_random_uuid(),
     "user_id" uuid not null,
-    "created_at" timestamp without time zone not null default now(),
-    "updated_at" timestamp without time zone not null default now()
+    "created_at" timestamp with time zone not null default now(),
+    "updated_at" timestamp with time zone not null default now()
 );
 
 
@@ -31,8 +31,8 @@ create table "public"."users" (
     "password_salt" bytea not null,
     "hashed_authkey" bytea not null,
     "authkey_salt" bytea not null,
-    "created_at" timestamp without time zone not null default now(),
-    "updated_at" timestamp without time zone not null default now()
+    "created_at" timestamp with time zone not null default now(),
+    "updated_at" timestamp with time zone not null default now()
 );
 
 
