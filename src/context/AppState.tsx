@@ -71,7 +71,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     async (localAuth: LocalAuth, localUser: LocalUser) => {
       setLocalAuth(localAuth);
       setCurrentUser(localUser);
-      await Store.syncPages();
+      Store.syncPages();
       Store.getPages();
     },
     []

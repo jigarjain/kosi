@@ -1,12 +1,13 @@
 import { fullNameRegex, passwordRegex, usernameRegex } from "@/lib/validators";
 
 type Props = {
+  isSubmitting: boolean;
   handleScreenChange: () => void;
   handleSubmit: (data: FormData) => Promise<void>;
 };
 
 export default function Signup(props: Props) {
-  const { handleScreenChange, handleSubmit } = props;
+  const { handleScreenChange, handleSubmit, isSubmitting } = props;
   return (
     <form action={handleSubmit}>
       <div className="card card-sm overflow-hidden">
@@ -135,7 +136,14 @@ export default function Signup(props: Props) {
             </span>
           </div>
           <div className="card-actions items-center gap-6">
-            <button type="submit" className="btn btn-primary">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting && (
+                <span className="loading loading-spinner"></span>
+              )}
               Register
             </button>
             <button className="link" onClick={handleScreenChange}>

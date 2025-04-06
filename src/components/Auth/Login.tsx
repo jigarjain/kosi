@@ -3,10 +3,11 @@ import { passwordRegex, usernameRegex } from "@/lib/validators";
 type Props = {
   handleScreenChange: () => void;
   handleSubmit: (data: FormData) => Promise<void>;
+  isSubmitting: boolean;
 };
 
 export default function Login(props: Props) {
-  const { handleScreenChange, handleSubmit } = props;
+  const { handleScreenChange, handleSubmit, isSubmitting } = props;
 
   return (
     <form action={handleSubmit}>
@@ -92,7 +93,14 @@ export default function Login(props: Props) {
             </span>
           </div>
           <div className="card-actions items-center gap-6">
-            <button type="submit" className="btn btn-primary">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isSubmitting}
+            >
+              {isSubmitting && (
+                <span className="loading loading-spinner"></span>
+              )}
               Login
             </button>
             <button className="link" onClick={handleScreenChange}>

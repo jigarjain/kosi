@@ -56,12 +56,8 @@ export function createNewPage(pageDate: string, userId: string): LocalPage {
   return {
     id: crypto.randomUUID(),
     user_id: userId,
-    created_at: new Date(
-      `${pageDate}T${new Date().toISOString().split("T")[1]}`
-    ),
-    updated_at: new Date(
-      `${pageDate}T${new Date().toISOString().split("T")[1]}`
-    )
+    created_at: new Date(pageDate),
+    updated_at: new Date(pageDate)
   };
 }
 

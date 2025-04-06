@@ -106,12 +106,14 @@ export const Auth = ({ onAuthComplete }: { onAuthComplete: () => void }) => {
         <Login
           handleScreenChange={handleScreenChange}
           handleSubmit={handleLogin}
+          isSubmitting={loginMutation.isPending}
         />
       )}
       {authScreen === "register" && (
         <Signup
           handleScreenChange={handleScreenChange}
           handleSubmit={handleSignup}
+          isSubmitting={signupMutation.isPending}
         />
       )}
       {authScreen === "recoveryPhrase" && (

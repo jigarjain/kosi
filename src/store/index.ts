@@ -51,7 +51,7 @@ class Store {
     username: string,
     password: string
   ): Promise<{ recoveryPhrase: string; user_id: string }> {
-    console.log("[Store] registerUser", name, username, password);
+    console.log("[Store] registerUser");
     return await AuthStore.registerUser(name, username, password);
   }
 
@@ -59,7 +59,7 @@ class Store {
     username: string,
     password: string
   ): Promise<{ localAuth: LocalAuth | null; localUser: LocalUser | null }> {
-    console.log("[Store] getAuth", username, password);
+    console.log("[Store] getAuth");
     return await AuthStore.getAuth(username, password);
   }
 
@@ -69,7 +69,7 @@ class Store {
   }
 
   public static async updateLocalAuth(auth: LocalAuth): Promise<void> {
-    console.log("[Store] updateLocalAuth", auth);
+    console.log("[Store] updateLocalAuth");
     await AuthStore.updateLocalAuth(auth);
   }
 
@@ -85,7 +85,7 @@ class Store {
   }
 
   public static async updateLocalUser(user: LocalUser): Promise<LocalUser> {
-    console.log("[Store] updateLocalUser", user);
+    console.log("[Store] updateLocalUser");
     return await UserStore.updateLocalUser(user);
   }
 
