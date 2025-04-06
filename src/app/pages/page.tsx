@@ -24,6 +24,12 @@ export default function Page() {
   });
 
   useEffect(() => {
+    if (getPageQuery.isSuccess) {
+      setCurrentPage(getPageQuery.data || null);
+    }
+  }, [getPageQuery.isSuccess, getPageQuery.data, setCurrentPage]);
+
+  useEffect(() => {
     // If no date is provided, redirect to today's page
     if (!date) {
       const today = new Date();
@@ -31,13 +37,6 @@ export default function Page() {
       router.push(`/pages?date=${todaySlug}`);
     }
   }, [date, router]);
-
-  useEffect(() => {
-    // If the date is provided, set the current page to the page with that date
-    if (getPageQuery.isSuccess) {
-      setCurrentPage(getPageQuery.data || null);
-    }
-  }, [getPageQuery.isSuccess, getPageQuery.data, setCurrentPage]);
 
   return (
     <>

@@ -9,28 +9,26 @@ import {
   useState
 } from "react";
 import { LocalAuth } from "@/types/Auth";
-import { Page } from "@/types/Page";
+import { LocalPage } from "@/types/Page";
 import { LocalUser } from "@/types/User";
 import Store from "@/store";
 
 export interface AppState {
-  currentPage: Page | null;
+  currentPage: LocalPage | null;
   currentUser: LocalUser | null;
   localAuth: LocalAuth | null;
-  setCurrentPage: (page: Page | null) => void;
-  setCurrentUser: (user: LocalUser | null) => void;
-  setLocalAuth: (localAuth: LocalAuth | null) => void;
-  handleLogout: () => Promise<void>;
+  setCurrentPage: (page: LocalPage | null) => void;
+  onLogout: () => Promise<void>;
+  onLogin: (localAuth: LocalAuth, localUser: LocalUser) => Promise<void>;
 }
 
 const defaultAppState: AppState = {
   currentPage: null,
   currentUser: null,
   localAuth: null,
-  setCurrentPage: () => {}, // no-op function
-  setCurrentUser: () => {}, // no-op function
-  setLocalAuth: () => {}, // no-op function
-  handleLogout: async () => {} // no-op function
+  setCurrentPage: () => {},
+  onLogout: async () => {},
+  onLogin: async () => {}
 };
 
 export const AppStateContext = createContext<AppState>(defaultAppState);
@@ -38,21 +36,10 @@ export const AppStateContext = createContext<AppState>(defaultAppState);
 export const useAppState = () => useContext(AppStateContext);
 
 export function AppStateProvider({ children }: { children: React.ReactNode }) {
-  const [currentPage, setCurrentPage] = useState<Page | null>(null);
+  const [currentPage, setCurrentPage] = useState<LocalPage | null>(null);
   const [currentUser, setCurrentUser] = useState<LocalUser | null>(null);
   const [localAuth, setLocalAuth] = useState<LocalAuth | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  const handleLogout = useCallback(async () => {
-    await Promise.all([
-      Store.clearAuthStore(),
-      Store.clearUserStore(),
-      Store.clearPageStore(),
-      Store.clearEntryStore()
-    ]);
-    setLocalAuth(null);
-    setCurrentUser(null);
-  }, [setLocalAuth, setCurrentUser]);
 
   useEffect(() => {
     const setup = async () => {
@@ -69,15 +56,33 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     setup();
   }, []);
 
+  const onLogout = useCallback(async () => {
+    await Promise.all([
+      Store.clearAuthStore(),
+      Store.clearUserStore(),
+      Store.clearPageStore(),
+      Store.clearEntryStore()
+    ]);
+    window.location.reload();
+  }, []);
+
+  const onLogin = useCallback(
+    async (localAuth: LocalAuth, localUser: LocalUser) => {
+      setLocalAuth(localAuth);
+      setCurrentUser(localUser);
+      Store.getPages();
+    },
+    []
+  );
+
   const appState: AppState = useMemo(
     () => ({
       currentPage,
       currentUser,
       localAuth,
       setCurrentPage,
-      setCurrentUser,
-      setLocalAuth,
-      handleLogout
+      onLogout,
+      onLogin
     }),
     [
       currentPage,
@@ -86,7 +91,8 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       setCurrentPage,
       setCurrentUser,
       setLocalAuth,
-      handleLogout
+      onLogout,
+      onLogin
     ]
   );
 

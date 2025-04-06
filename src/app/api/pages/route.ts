@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
 
   // Validate input using Zod
   const result = GetPageRequestSchema.safeParse({
-    date: request.nextUrl.searchParams.get("date")
+    date: request.nextUrl.searchParams.get("date") || undefined
   });
 
   if (!result.success) {

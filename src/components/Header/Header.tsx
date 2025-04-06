@@ -5,7 +5,7 @@ import { Auth } from "../Auth/Auth";
 import Modal from "../Modal";
 
 export default function Header() {
-  const { currentUser, localAuth, handleLogout } = useAppState();
+  const { currentUser, localAuth, onLogout } = useAppState();
 
   const name = currentUser?.name;
 
@@ -43,7 +43,7 @@ export default function Header() {
                 className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
               >
                 <li>
-                  <a onClick={handleLogout}>Logout</a>
+                  <a onClick={onLogout}>Logout</a>
                 </li>
               </ul>
             </div>

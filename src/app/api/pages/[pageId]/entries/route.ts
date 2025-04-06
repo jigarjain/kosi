@@ -10,7 +10,7 @@ type Params = {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Params }
+  { params }: { params: Promise<Params> }
 ) {
   const { pageId } = await params;
 

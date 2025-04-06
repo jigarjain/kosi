@@ -11,7 +11,7 @@ import Signup from "./Signup";
 type AuthScreen = "register" | "login" | "recoveryPhrase";
 
 export const Auth = ({ onAuthComplete }: { onAuthComplete: () => void }) => {
-  const { setLocalAuth, setCurrentUser } = useAppState();
+  const { onLogin } = useAppState();
   const [authScreen, setAuthScreen] = useState<AuthScreen>("register");
   const [recoveryPhrase, setRecoveryPhrase] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -34,10 +34,9 @@ export const Auth = ({ onAuthComplete }: { onAuthComplete: () => void }) => {
       }
       return result as { localAuth: LocalAuth; localUser: LocalUser };
     },
-    onSuccess: ({ localAuth, localUser }) => {
+    onSuccess: async ({ localAuth, localUser }) => {
       setErrorMessage("");
-      setLocalAuth(localAuth);
-      setCurrentUser(localUser);
+      await onLogin(localAuth, localUser);
       onAuthComplete();
     },
     onError: (error) => {

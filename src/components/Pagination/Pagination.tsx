@@ -26,7 +26,7 @@ export default function Pagination() {
         {previousPage && (
           <Link
             href={`/pages?date=${previousPage}`}
-            className="btn btn-ghost"
+            className="btn btn-ghost hover:bg-transparent border-none"
             title="Show Previous Page"
           >
             Previous Page
@@ -54,7 +54,7 @@ export default function Pagination() {
         {nextPage && (
           <Link
             href={`/pages?date=${nextPage}`}
-            className="btn btn-ghost"
+            className="btn btn-ghost hover:bg-transparent border-none"
             title="Show Next Page"
           >
             Next Page

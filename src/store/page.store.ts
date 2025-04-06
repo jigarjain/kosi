@@ -1,4 +1,4 @@
-import { AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { LocalEntry } from "@/types/Entry";
 import { LocalPage } from "@/types/Page";
 import {
@@ -14,8 +14,15 @@ import {
 import { apiClient } from "@/lib/api.client";
 import { decryptData, encryptData } from "@/lib/crypto";
 import { dbOperations } from "@/lib/db";
-import { base64ToUint8Array, uint8ArrayToBase64 } from "@/lib/utils";
+import { queryClient } from "@/lib/query.client";
+import {
+  base64ToUint8Array,
+  convertToPageDate,
+  uint8ArrayToBase64
+} from "@/lib/utils";
 import { AuthStore } from "./auth.store";
+
+type fetchPageParams = { pageId: string } | { pageDate: string };
 
 export class PageStore {
   protected constructor() {}
@@ -57,31 +64,94 @@ export class PageStore {
     return { page: localPage, entries: localEntries };
   }
 
-  public static async getPages(): Promise<LocalPage[]> {
-    console.debug("[PageStore] getPages");
-
+  private static async fetchPages() {
+    console.debug("[PageStore] fetchPages");
     const auth = await AuthStore.getLocalAuth();
 
     if (!auth) {
-      console.warn("Not logged in, fetching pages from local DB");
-      return await dbOperations.getAllPages();
+      return;
     }
 
     let response: AxiosResponse<GetPagesResponseDto>;
+
     try {
       response = await apiClient.get<GetPagesResponseDto>("/pages");
     } catch (error) {
       console.error("Error fetching pages:", error);
-      return [];
+      return;
     }
 
-    const pageResults = await Promise.all(
+    const processedPages = await Promise.all(
       response.data.pages.map(async (page) => {
         return await this.processPage(page);
       })
     );
 
-    return pageResults.map((page) => page.page);
+    processedPages.forEach(({ page, entries }) => {
+      queryClient.setQueryData(["pages", page.id], page);
+      queryClient.setQueryData(
+        ["pages", convertToPageDate(page.created_at)],
+        page
+      );
+      queryClient.setQueryData(["entries", "byPage", page.id], entries);
+    });
+  }
+
+  private static async fetchPage(params: fetchPageParams) {
+    console.debug("[PageStore] fetchPage", params);
+    const auth = await AuthStore.getLocalAuth();
+
+    if (!auth) {
+      return;
+    }
+
+    let url = "/pages";
+    let response;
+    let queryKey: string[];
+
+    try {
+      if ("pageId" in params) {
+        url = `${url}/${params.pageId}`;
+        response = await apiClient.get<PageDto>(url);
+        queryKey = ["pages", params.pageId];
+      } else {
+        url = `${url}?date=${params.pageDate}`;
+        response = await apiClient.get<GetPagesResponseDto>(url);
+        queryKey = ["pages", params.pageDate];
+      }
+    } catch (error) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
+        console.log("Page not found with params", params);
+        return;
+      } else {
+        console.error("Error fetching page", error);
+        return;
+      }
+    }
+
+    let page;
+
+    if ("pageId" in params) {
+      page = (response as AxiosResponse<PageDto>).data;
+    } else {
+      page = (response as AxiosResponse<GetPagesResponseDto>).data.pages[0];
+    }
+
+    const { page: localPage, entries: localEntries } =
+      await this.processPage(page);
+
+    queryClient.setQueryData(queryKey, () => localPage);
+    queryClient.setQueryData(
+      ["entries", "byPage", localPage.id],
+      () => localEntries
+    );
+  }
+
+  public static async getPages(): Promise<LocalPage[]> {
+    console.debug("[PageStore] getPages");
+
+    this.fetchPages();
+    return await dbOperations.getAllPages();
   }
 
   public static async getPageByDate(
@@ -89,59 +159,15 @@ export class PageStore {
   ): Promise<LocalPage | null> {
     console.debug("[PageStore] getPageByDate", pageDate);
 
-    const auth = await AuthStore.getLocalAuth();
-
-    if (!auth) {
-      console.warn("Not logged in, fetching page from local DB");
-      return await dbOperations.getPageByDate(pageDate);
-    }
-
-    let response: AxiosResponse<GetPagesResponseDto>;
-
-    try {
-      response = await apiClient.get<GetPagesResponseDto>(
-        `/pages?date=${pageDate}`
-      );
-    } catch (error) {
-      console.log("Error fetching page by date:", error);
-      return null;
-    }
-
-    if (response.data.pages.length === 0) {
-      return null;
-    }
-
-    const page = response.data.pages[0];
-
-    const { page: localPage } = await this.processPage(page);
-
-    return localPage;
+    this.fetchPage({ pageDate });
+    return await dbOperations.getPageByDate(pageDate);
   }
 
   public static async getPageById(pageId: string): Promise<LocalPage | null> {
     console.debug("[PageStore] getPageById", pageId);
 
-    const auth = await AuthStore.getLocalAuth();
-
-    if (!auth) {
-      console.warn("Not logged in, fetching page from local DB");
-      return await dbOperations.getPage(pageId);
-    }
-
-    try {
-      const response = await apiClient.get<PageDto>(`/pages/${pageId}`);
-
-      if (response.status !== 200) {
-        return null;
-      }
-
-      const { page: localPage } = await this.processPage(response.data);
-
-      return localPage;
-    } catch (error) {
-      console.error("Error fetching page by id:", error);
-      throw error;
-    }
+    this.fetchPage({ pageId });
+    return await dbOperations.getPage(pageId);
   }
 
   public static async addPage(page: LocalPage): Promise<LocalPage> {
@@ -188,26 +214,8 @@ export class PageStore {
   public static async getEntriesByPage(pageId: string): Promise<LocalEntry[]> {
     console.debug("[PageStore] getEntriesByPage", pageId);
 
-    const auth = await AuthStore.getLocalAuth();
-
-    if (!auth) {
-      console.warn("Not logged in, fetching entries from local DB");
-      return await dbOperations.getEntriesByPageId(pageId);
-    }
-
-    // If no entries found locally, try fetching from API
-    try {
-      const page = await this.getPageById(pageId);
-      if (!page) {
-        console.log("No page found, returning empty array");
-        return [];
-      }
-
-      return await dbOperations.getEntriesByPageId(page.id);
-    } catch (error) {
-      console.error("Error fetching entries from API:", error);
-      return [];
-    }
+    this.fetchPage({ pageId });
+    return await dbOperations.getEntriesByPageId(pageId);
   }
 
   public static async addEntry(entry: LocalEntry): Promise<LocalEntry> {

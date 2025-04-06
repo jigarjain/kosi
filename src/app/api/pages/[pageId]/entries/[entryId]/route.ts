@@ -15,10 +15,10 @@ type Params = {
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Params }
+  { params }: { params: Promise<Params> }
 ) {
   // Read pageId and entryId from the url next params
-  const { pageId, entryId } = params;
+  const { pageId, entryId } = await params;
 
   // Parse and validate the request body
   const body: unknown = await request.json();
@@ -71,10 +71,10 @@ export async function PUT(
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Params }
+  { params }: { params: Promise<Params> }
 ) {
   // Read pageId and entryId from the url next params
-  const { pageId, entryId } = params;
+  const { pageId, entryId } = await params;
 
   // Get the entry
   const { data, error } = await supabaseClient
@@ -106,10 +106,10 @@ export async function GET(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Params }
+  { params }: { params: Promise<Params> }
 ) {
   // Read pageId and entryId from the url next params
-  const { pageId, entryId } = params;
+  const { pageId, entryId } = await params;
 
   // Delete the entry
   const { error } = await supabaseClient

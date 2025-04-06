@@ -7,11 +7,11 @@ import { AUTH_USER_ID_HEADER } from "@/app/api/auth/auth.helper";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { pageId: string } }
+  { params }: { params: Promise<{ pageId: string }> }
 ) {
   // Get the user ID from the request header set by middleware
   const authorizedUserId = request.headers.get(AUTH_USER_ID_HEADER);
-  const pageId = params.pageId;
+  const { pageId } = await params;
 
   // Validate user_id
   if (!authorizedUserId) {
