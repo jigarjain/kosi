@@ -16,7 +16,8 @@
     "lint": "next lint",
     "format": "prettier --write .",
     "prepare": "husky",
-    "db:types": "supabase gen types typescript --local > ./src/types/database.types.ts"
+    "db:types": "supabase gen types typescript --local > ./src/types/database.types.ts",
+    "db:migrate": "supabase db migration up"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",

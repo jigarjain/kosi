@@ -1,4 +1,4 @@
-# Kosi
+# KOSI
 
 A simple, secure, and offline-first journaling application with end-to-end encryption.
 
@@ -12,11 +12,11 @@ A simple, secure, and offline-first journaling application with end-to-end encry
 ## Tech Stack
 
 - **Language**: TypeScript
-- **Frontend Framework**: Next.js 15^ + React v19^
+- **Framework**: Next.js 15^ + React v19^
 - **Styling**: TailwindCSS + DaisyUI
-- **Database**: Postgres
-- **Storage**: IndexedDB (offline) + Supabase (online)
-- **Security**: Web Crypto API for E2EE
+- **Database**: Supabase (online) + IndexedDB (offline)
+- **Security**: Web Crypto API for E2EE + JWT for authorization
+- **Deployment** Vercel + GitHub Actions
 
 ## Prerequisites
 
@@ -55,7 +55,7 @@ npx supabase start
 npx supabase migration up
 ```
 
-Open [http://127.0.0.1:54323](http://127.0.0.1:54323) with your browser to see Supabase dashboard.
+Open [http://127.0.0.1:54323](http://127.0.0.1:54323) with your browser to see the local Supabase dashboard.
 
 5. Set .env values
 
@@ -66,13 +66,19 @@ KOSI_SUPABASE_API_URL=
 KOSI_SUPABASE_SERVICE_ROLE_KEY=
 ```
 
-5. Run the Next.js development server:
+6. Generate types from Supabase database schema for the app
+
+```bash
+npm run db:types
+```
+
+7. Run the Next.js development server:
 
 ```bash
 npm run dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) with your browser to see the app.
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the app.
 
 ## Development Status
 
