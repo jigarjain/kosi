@@ -16,7 +16,7 @@ export interface User {
 export interface LocalUser {
   id: User["id"];
   name: User["name"];
-  username?: User["username"];
+  username: User["username"];
   created_at: User["created_at"];
   updated_at: User["updated_at"];
 }

@@ -143,6 +143,11 @@ class Store {
     console.log("[Store] clearEntryStore");
     await PageStore.clearEntryStore();
   }
+
+  public static async syncPages(): Promise<void> {
+    console.log("[Store] syncPages");
+    await PageStore.syncPages();
+  }
 }
 
 // Initialize the store

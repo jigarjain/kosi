@@ -46,7 +46,8 @@ export async function GET(
           "id" | "content" | "iv" | "created_at" | "updated_at" | "page_id"
         >
       >("id, content, iv, created_at, updated_at, page_id")
-      .eq("page_id", page.id);
+      .eq("page_id", page.id)
+      .order("created_at", { ascending: true });
 
     if (entriesError) {
       return NextResponse.json(
@@ -64,10 +65,7 @@ export async function GET(
 
     // Format the single page response
     const response: PageDto = {
-      id: page.id,
-      user_id: page.user_id,
-      created_at: page.created_at!,
-      updated_at: page.updated_at!,
+      ...page,
       entries: formattedEntries as EntryDto[]
     };
 

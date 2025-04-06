@@ -50,6 +50,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       ]);
       setCurrentUser(localUser);
       setLocalAuth(localAuth);
+      Store.syncPages();
       setIsLoading(false);
     };
 
@@ -70,6 +71,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
     async (localAuth: LocalAuth, localUser: LocalUser) => {
       setLocalAuth(localAuth);
       setCurrentUser(localUser);
+      await Store.syncPages();
       Store.getPages();
     },
     []
@@ -84,16 +86,7 @@ export function AppStateProvider({ children }: { children: React.ReactNode }) {
       onLogout,
       onLogin
     }),
-    [
-      currentPage,
-      currentUser,
-      localAuth,
-      setCurrentPage,
-      setCurrentUser,
-      setLocalAuth,
-      onLogout,
-      onLogin
-    ]
+    [currentPage, currentUser, localAuth, setCurrentPage, onLogout, onLogin]
   );
 
   if (isLoading) {

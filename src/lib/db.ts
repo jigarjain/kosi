@@ -88,6 +88,12 @@ export const dbOperations = {
     return await dbOperations.getEntriesByPageId(page.id);
   },
 
+  getEntriesWithoutIv: async (): Promise<LocalEntry[]> => {
+    const db = await getDB();
+    const result = await db.getAll(ENTRIES_STORE);
+    return result.filter((entry) => !entry.iv) as LocalEntry[];
+  },
+
   clearPageStore: async (): Promise<void> => {
     const db = await getDB();
     const transaction = db.transaction(PAGES_STORE, "readwrite");

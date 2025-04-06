@@ -9,6 +9,8 @@ import {
   EntryDto,
   GetPagesResponseDto,
   PageDto,
+  SyncRequestDto,
+  SyncResponseDto,
   UpdateEntryRequestDto
 } from "@/types/dto.types";
 import { apiClient } from "@/lib/api.client";
@@ -182,6 +184,7 @@ export class PageStore {
 
     try {
       const pageData: CreatePageRequestDto = {
+        id: page.id,
         created_at: page.created_at.toISOString(),
         updated_at: page.updated_at.toISOString()
       };
@@ -236,6 +239,7 @@ export class PageStore {
       const iv = uint8ArrayToBase64(encryptResult.iv);
 
       const entryData: CreateEntryRequestDto = {
+        id: entry.id,
         created_at: entry.created_at.toISOString(),
         updated_at: entry.updated_at.toISOString(),
         content,
@@ -253,10 +257,8 @@ export class PageStore {
 
       const responseEntry = response.data;
       const createdEntry: LocalEntry = {
-        id: responseEntry.id,
-        page_id: responseEntry.page_id,
+        ...responseEntry,
         content: entry.content,
-        iv,
         created_at: new Date(responseEntry.created_at),
         updated_at: new Date(responseEntry.updated_at)
       };
@@ -277,7 +279,13 @@ export class PageStore {
     const auth = await AuthStore.getLocalAuth();
     if (!auth) {
       console.warn("Not logged in, updating entry locally only");
-      const updatedEntry: LocalEntry = { ...entry, updated_at: new Date() };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { iv, ...rest } = entry;
+
+      const updatedEntry: LocalEntry = {
+        ...rest,
+        updated_at: new Date()
+      };
       await dbOperations.updateEntry(updatedEntry);
       return updatedEntry;
     }
@@ -359,5 +367,87 @@ export class PageStore {
   public static async clearEntryStore(): Promise<void> {
     console.debug("[PageStore] clearEntryStore");
     await dbOperations.clearEntryStore();
+  }
+
+  public static async syncPages(): Promise<void> {
+    console.debug("[PageStore] syncPages");
+    const auth = await AuthStore.getLocalAuth();
+    if (!auth) {
+      console.warn("Not logged in, skipping sync");
+      return;
+    }
+
+    // Get all entries from localDB which does not have `iv` set
+    const entriesToSync = await dbOperations.getEntriesWithoutIv();
+
+    if (entriesToSync.length === 0) {
+      console.debug("[PageStore] No entries to sync");
+      return;
+    }
+
+    // Get all pages that have entries to sync
+    const pageIds = [...new Set(entriesToSync.map((entry) => entry.page_id))];
+    const pages = (await Promise.all(
+      pageIds.map((pageId) => dbOperations.getPage(pageId))
+    )) as LocalPage[];
+
+    // For each entry, encrypt the content and iv
+    const encryptedEntries = await Promise.all(
+      entriesToSync.map(async (entry) => {
+        const encryptResult = await encryptData(entry.content, auth.dek);
+
+        // Convert binary data to base64 strings if necessary
+        const content = uint8ArrayToBase64(encryptResult.encryptedData);
+        const iv = uint8ArrayToBase64(encryptResult.iv);
+
+        return {
+          ...entry,
+          content,
+          iv,
+          created_at:
+            typeof entry.created_at === "string"
+              ? entry.created_at
+              : entry.created_at.toISOString(),
+          updated_at:
+            typeof entry.updated_at === "string"
+              ? entry.updated_at
+              : entry.updated_at.toISOString()
+        };
+      })
+    );
+
+    // Prepare the data for the sync request in SyncRequestDto format
+    const syncData: SyncRequestDto = {
+      pages: pages.map((page) => ({
+        id: page.id,
+        created_at:
+          typeof page.created_at === "string"
+            ? page.created_at
+            : page.created_at.toISOString(),
+        updated_at:
+          typeof page.updated_at === "string"
+            ? page.updated_at
+            : page.updated_at.toISOString(),
+        entries: encryptedEntries.filter((entry) => entry.page_id === page.id)
+      }))
+    };
+
+    // Send the request to the server
+    const response = await apiClient.post<SyncResponseDto>("/sync", syncData);
+
+    // Update the localDB with the response
+    if (response.data && response.data.pages) {
+      for (const page of response.data.pages) {
+        const { page: localPage, entries: localEntries } =
+          await this.processPage(page);
+
+        queryClient.setQueryData(["pages", localPage.id], localPage);
+        queryClient.setQueryData(
+          ["pages", convertToPageDate(localPage.created_at)],
+          page
+        );
+        queryClient.setQueryData(["entries", "byPage", page.id], localEntries);
+      }
+    }
   }
 }

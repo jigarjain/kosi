@@ -3,70 +3,13 @@ import { Tables } from "@/types/database.types";
 import {
   CreatePageRequestSchema,
   CreatePageResponseDto,
-  EntryDto,
   GetPageRequestSchema,
   GetPagesResponseDto,
   PageDto
 } from "@/types/dto.types";
 import { supabaseClient } from "@/lib/supabase";
-import { PGHexToBase64 } from "@/lib/utils";
 import { AUTH_USER_ID_HEADER } from "@/app/api/auth/auth.helper";
-
-// Helper function to fetch and format entries for given page IDs
-async function fetchAndFormatEntries(
-  pageIds: string[]
-): Promise<Record<string, EntryDto[]>> {
-  if (pageIds.length === 0) {
-    return {};
-  }
-
-  const { data: allEntriesData, error: entriesError } = await supabaseClient
-    .from("entries")
-    .select<
-      string,
-      Pick<
-        Tables<"entries">,
-        "id" | "content" | "iv" | "created_at" | "updated_at" | "page_id"
-      >
-    >("id, content, iv, created_at, updated_at, page_id")
-    .in("page_id", pageIds);
-
-  if (entriesError) {
-    console.error("Error fetching entries for pages:", entriesError);
-    // Return an empty map, indicating no entries could be fetched
-    return {};
-  }
-
-  // Convert content and iv from PGHex to base64
-  const convertedEntriesData = allEntriesData.map((entry) => ({
-    ...entry,
-    content: PGHexToBase64(entry.content),
-    iv: PGHexToBase64(entry.iv)
-  }));
-
-  // Group entries by page_id
-  const entriesByPageId = convertedEntriesData.reduce(
-    (acc, entry) => {
-      const pageId = entry.page_id; // Type assertion needed if TS complains
-      if (!acc[pageId]) {
-        acc[pageId] = [];
-      }
-      // Ensure we push EntryDto compatible objects
-      acc[pageId].push({
-        id: entry.id,
-        content: entry.content,
-        iv: entry.iv,
-        created_at: entry.created_at!,
-        updated_at: entry.updated_at!,
-        page_id: entry.page_id
-      });
-      return acc;
-    },
-    {} as Record<string, EntryDto[]> // Initialize with the correct type
-  );
-
-  return entriesByPageId;
-}
+import { fetchAndFormatEntries } from "./route.helper";
 
 export async function GET(request: NextRequest) {
   // Get the user ID from the request header set by middleware
@@ -139,14 +82,14 @@ export async function GET(request: NextRequest) {
 
     // Fetch entries for the retrieved pages
     const pageIds = pagesData.map((page) => page.id);
-    const entriesByPageId = await fetchAndFormatEntries(pageIds);
+    const entriesByPageId = await fetchAndFormatEntries(
+      pageIds,
+      supabaseClient
+    );
 
     // Map pages data and combine with entries
     const formattedPages = pagesData.map((page) => ({
-      id: page.id,
-      user_id: page.user_id,
-      created_at: page.created_at!,
-      updated_at: page.updated_at!,
+      ...page,
       entries: entriesByPageId[page.id] || [] // Assign entries, default to empty array if none found
     }));
 
@@ -214,10 +157,7 @@ export async function POST(request: NextRequest) {
     // Return the newly created page
     const response: CreatePageResponseDto = {
       page: {
-        id: newPage.id,
-        user_id: newPage.user_id,
-        created_at: newPage.created_at!,
-        updated_at: newPage.updated_at!,
+        ...newPage,
         entries: []
       }
     };

@@ -82,6 +82,7 @@ export const GetPagesResponseSchema = z.object({
 });
 
 export const CreatePageRequestSchema = z.object({
+  id: z.string().uuid("`id` must be a valid UUID"),
   created_at: z.string().datetime("`created_at` must be a valid date"),
   updated_at: z.string().datetime("`updated_at` must be a valid date")
 });
@@ -92,6 +93,7 @@ export const CreatePageResponseSchema = z.object({
 
 // Entry-related schemas
 export const CreateEntryRequestSchema = z.object({
+  id: z.string().uuid("`id` must be a valid UUID"),
   content: base64String(),
   iv: base64String(),
   created_at: z.string().datetime("`created_at` must be a valid date"),
@@ -105,6 +107,23 @@ export const UpdateEntryRequestSchema = z.object({
 
 export const DeleteEntryResponseSchema = z.object({
   success: z.boolean()
+});
+
+// Sync-related schemas
+const SyncEntrySchema = CreateEntryRequestSchema.extend({
+  is_delete: z.boolean().optional()
+});
+
+const SyncPageSchema = CreatePageRequestSchema.extend({
+  entries: z.array(SyncEntrySchema)
+});
+
+export const SyncRequestSchema = z.object({
+  pages: z.array(SyncPageSchema)
+});
+
+export const SyncResponseSchema = z.object({
+  pages: z.array(PageSchema)
 });
 
 // Create types from Zod schemas
@@ -123,3 +142,7 @@ export type CreatePageResponseDto = z.infer<typeof CreatePageResponseSchema>;
 export type CreateEntryRequestDto = z.infer<typeof CreateEntryRequestSchema>;
 export type UpdateEntryRequestDto = z.infer<typeof UpdateEntryRequestSchema>;
 export type DeleteEntryResponseDto = z.infer<typeof DeleteEntryResponseSchema>;
+export type SyncRequestDto = z.infer<typeof SyncRequestSchema>;
+export type SyncResponseDto = z.infer<typeof SyncResponseSchema>;
+export type SyncEntryDto = z.infer<typeof SyncEntrySchema>;
+export type SyncPageDto = z.infer<typeof SyncPageSchema>;

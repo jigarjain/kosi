@@ -32,11 +32,7 @@ export default function EntryItem({ entry }: { entry: LocalEntry }) {
 
   const updateEntry = useMutation<LocalEntry, Error, LocalEntry>({
     mutationFn: async (entry: LocalEntry) => {
-      const updatedEntry = {
-        ...entry,
-        updated_at: new Date()
-      };
-      return Store.updateEntry(updatedEntry);
+      return Store.updateEntry(entry);
     },
     onSuccess: (_, variables) => {
       setError(null);
