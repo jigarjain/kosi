@@ -7,8 +7,8 @@ CREATE TABLE pages (
   
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_pages_id ON pages(id);

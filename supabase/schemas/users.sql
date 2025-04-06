@@ -16,8 +16,8 @@ CREATE TABLE users (
   hashed_authkey BYTEA NOT NULL,
   authkey_salt BYTEA NOT NULL,
 
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
+  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 CREATE INDEX idx_users_username ON users(username);
