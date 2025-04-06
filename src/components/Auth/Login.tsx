@@ -1,3 +1,5 @@
+import { passwordRegex, usernameRegex } from "@/lib/validators";
+
 type Props = {
   handleScreenChange: () => void;
   handleSubmit: (data: FormData) => Promise<void>;
@@ -27,11 +29,11 @@ export default function Login(props: Props) {
                     d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0ZM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.645-6.374-1.766Z"
                   ></path>
                 </svg>{" "}
-                Login
+                Login to sync your data
               </div>
             </div>
           </div>
-        </div>{" "}
+        </div>
         <div className="card-body gap-4">
           <div className="flex flex-col gap-1">
             <label
@@ -51,10 +53,14 @@ export default function Login(props: Props) {
                 className="grow"
                 placeholder="Username"
                 name="username"
+                pattern={usernameRegex.source}
                 required
               />
             </label>
-          </div>{" "}
+            <span className="text-base-content/60 flex items-center gap-2 px-1 text-[0.6875rem]">
+              Username must be 3+ characters
+            </span>
+          </div>
           <div className="flex flex-col gap-1">
             <label
               className="input input-border flex max-w-none items-center gap-2 no focus:outline-none"
@@ -77,16 +83,20 @@ export default function Login(props: Props) {
                 className="grow"
                 placeholder="Password"
                 name="password"
+                pattern={passwordRegex.source}
                 required
               />
-            </label>{" "}
-          </div>{" "}
+            </label>
+            <span className="text-base-content/60 flex items-center gap-2 px-1 text-[0.6875rem]">
+              Password must be 5+ characters
+            </span>
+          </div>
           <div className="card-actions items-center gap-6">
             <button type="submit" className="btn btn-primary">
               Login
-            </button>{" "}
+            </button>
             <button className="link" onClick={handleScreenChange}>
-              Or Register
+              Or Create Account
             </button>
           </div>
         </div>

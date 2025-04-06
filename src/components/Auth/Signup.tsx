@@ -1,3 +1,5 @@
+import { fullNameRegex, passwordRegex, usernameRegex } from "@/lib/validators";
+
 type Props = {
   handleScreenChange: () => void;
   handleSubmit: (data: FormData) => Promise<void>;
@@ -30,7 +32,7 @@ export default function Signup(props: Props) {
               </div>
             </div>
           </div>
-        </div>{" "}
+        </div>
         <div className="card-body gap-4">
           <div className="flex flex-col gap-1">
             <label className="input input-border flex max-w-none items-center gap-2 no focus:outline-none">
@@ -41,16 +43,20 @@ export default function Signup(props: Props) {
                 className="h-4 w-4 opacity-70"
               >
                 <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z"></path>
-              </svg>{" "}
+              </svg>
               <input
                 type="text"
                 className="grow"
                 placeholder="Your Name"
                 name="name"
+                pattern={fullNameRegex.source}
                 required
               />
             </label>
-          </div>{" "}
+            <span className="text-base-content/60 flex items-center gap-2 px-1 text-[0.6875rem]">
+              Name must be 3+ characters
+            </span>
+          </div>
           <div className="flex flex-col gap-1">
             <label className="input input-border flex max-w-none items-center gap-2  no focus:outline-none">
               <svg
@@ -60,16 +66,20 @@ export default function Signup(props: Props) {
                 className="h-4 w-4 opacity-70"
               >
                 <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z"></path>
-              </svg>{" "}
+              </svg>
               <input
                 type="text"
                 className="grow"
                 placeholder="Username"
                 name="username"
+                pattern={usernameRegex.source}
                 required
               />
             </label>
-          </div>{" "}
+            <span className="text-base-content/60 flex items-center gap-2 px-1 text-[0.6875rem]">
+              Username must be 3+ characters
+            </span>
+          </div>
           <div className="flex flex-col gap-1">
             <label className="input input-border flex max-w-none items-center gap-2 no focus:outline-none">
               <svg
@@ -83,20 +93,20 @@ export default function Signup(props: Props) {
                   d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
                   clipRule="evenodd"
                 ></path>
-              </svg>{" "}
+              </svg>
               <input
                 type="password"
                 className="grow"
                 placeholder="Password"
                 name="password"
+                pattern={passwordRegex.source}
                 required
               />
-            </label>{" "}
+            </label>
             <span className="text-base-content/60 flex items-center gap-2 px-1 text-[0.6875rem]">
-              <span className="status status-error inline-block"></span>{" "}
-              Password must be 8+ characters
+              Password must be 5+ characters
             </span>
-          </div>{" "}
+          </div>
           <div className="flex flex-col gap-1">
             <label className="input input-border flex max-w-none items-center gap-2  no focus:outline-none">
               <svg
@@ -110,20 +120,24 @@ export default function Signup(props: Props) {
                   d="M14 6a4 4 0 0 1-4.899 3.899l-1.955 1.955a.5.5 0 0 1-.353.146H5v1.5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-2.293a.5.5 0 0 1 .146-.353l3.955-3.955A4 4 0 1 1 14 6Zm-4-2a.75.75 0 0 0 0 1.5.5.5 0 0 1 .5.5.75.75 0 0 0 1.5 0 2 2 0 0 0-2-2Z"
                   clipRule="evenodd"
                 ></path>
-              </svg>{" "}
+              </svg>
               <input
                 type="password"
                 className="grow"
                 placeholder="Re-enter password"
                 name="re-password"
+                pattern={passwordRegex.source}
                 required
               />
-            </label>{" "}
-          </div>{" "}
+            </label>
+            <span className="text-base-content/60 flex items-center gap-2 px-1 text-[0.6875rem]">
+              Passwords must match
+            </span>
+          </div>
           <div className="card-actions items-center gap-6">
             <button type="submit" className="btn btn-primary">
               Register
-            </button>{" "}
+            </button>
             <button className="link" onClick={handleScreenChange}>
               Or login
             </button>

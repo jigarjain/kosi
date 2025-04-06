@@ -51,7 +51,10 @@ export default function Header() {
               </ul>
             </div>
           ) : (
-            <button className="btn btn-xs btn-accent" onClick={handleOnClick}>
+            <button
+              className="btn btn-xs btn-outline btn-warning"
+              onClick={handleOnClick}
+            >
               Sync
             </button>
           )}
