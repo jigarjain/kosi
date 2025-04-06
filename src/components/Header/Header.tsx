@@ -19,7 +19,10 @@ export default function Header() {
 
   return (
     <>
-      <header className="navbar border-0 border-base-300 bg-success">
+      <header
+        className="navbar border-0 border-base-300 bg-success"
+        style={{ minHeight: "unset" }}
+      >
         <div className="navbar-start">
           <Link
             href="/"
@@ -34,7 +37,7 @@ export default function Header() {
               <div
                 tabIndex={0}
                 role="button"
-                className="btn btn-neutral btn-circle avatar"
+                className="btn btn-xs btn-neutral btn-circle avatar"
               >
                 {name ? name.charAt(0).toUpperCase() : "?"}
               </div>
@@ -49,7 +52,7 @@ export default function Header() {
             </div>
           ) : (
             <button className="btn btn-xs btn-accent" onClick={handleOnClick}>
-              Sign In / Register
+              Sync
             </button>
           )}
         </div>
