@@ -1,5 +1,6 @@
-import { generateMnemonic, mnemonicToSeedSync } from "bip39";
 import jwt from "jsonwebtoken";
+import { generateMnemonic, mnemonicToSeedSync } from "@scure/bip39";
+import { wordlist } from "@scure/bip39/wordlists/english";
 import { JWTUserPayload } from "@/app/api/auth/auth.helper";
 
 /**
@@ -48,7 +49,7 @@ export async function deriveMasterKey(
  * Generates a new recovery phrase
  */
 export function generateRecoveryPhrase(): string {
-  return generateMnemonic(128);
+  return generateMnemonic(wordlist, 256);
 }
 
 /**

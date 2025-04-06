@@ -9,8 +9,6 @@ export default function RecoveryPhrase({
   phrase,
   onClose
 }: RecoveryPhraseProps) {
-  const words = phrase.trim().split(/\s+/);
-
   const handleCopy = () => {
     navigator.clipboard
       .writeText(phrase)
@@ -27,18 +25,13 @@ export default function RecoveryPhrase({
       <div className="card-body">
         <h2 className="card-title mb-4">Your Recovery Phrase</h2>
         <p className="text-sm text-gray-600 mb-4">
-          Write down these words in given order and store them in a safe place.
-          They will be required to access your account if you ever forget your
-          password.
+          Save the below phrase securely. It will be required to access your
+          account if you ever forget your password.
         </p>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {words.map((word, index) => (
-            <span key={index} className="badge badge-outline">
-              {index + 1}. {word}
-            </span>
-          ))}
-        </div>
-        <div className="card-actions justify-end">
+        <p>
+          <pre className="whitespace-pre-wrap">{phrase}</pre>
+        </p>
+        <div className="card-actions justify-end mt-4">
           <button onClick={handleCopy} className="btn btn-primary">
             Copy to Clipboard
           </button>
